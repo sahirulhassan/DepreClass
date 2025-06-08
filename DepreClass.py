@@ -80,9 +80,7 @@ class DepreClass(QtWidgets.QMainWindow):
         features = df[['Suicidal Thoughts', 'Work Hours', 'Sleep Duration', 'Total_Stress',
        'Financial Stress', 'Academic Pressure', 'Age', 'Dietary Habits',
        'Family History']]
-        print("Checkpoint 1")
         prediction = self.model.predict(features)
-        print("Checkpoint 2")
         if prediction[0] == 1:
             result_text = "At risk of depression"
         else:
