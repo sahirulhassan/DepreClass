@@ -77,10 +77,12 @@ class DepreClass(QtWidgets.QMainWindow):
         df['Total_Stress'] = df['Academic Pressure'] + df['Financial Stress']
 
         # Construct the features numpy array (in desired order)
-        features = df[['Suicidal Thoughts', 'Academic Pressure', 'Total_Stress',
-       'Sleep Duration', 'Financial Stress', 'Work Hours', 'Age',
-       'Dietary Habits', 'Family History']]
+        features = df[['Suicidal Thoughts', 'Work Hours', 'Sleep Duration', 'Total_Stress',
+       'Financial Stress', 'Academic Pressure', 'Age', 'Dietary Habits',
+       'Family History']]
+        print("Checkpoint 1")
         prediction = self.model.predict(features)
+        print("Checkpoint 2")
         if prediction[0] == 1:
             result_text = "At risk of depression"
         else:
