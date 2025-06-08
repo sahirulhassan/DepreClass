@@ -34,7 +34,7 @@ class DepreClass(QtWidgets.QMainWindow):
         suicidal_thoughts = self.ui.suicidalThoughtsButtonGroup.checkedButton()
         fam_history = self.ui.famHistoryButtonGroup.checkedButton()
         # check if any of the fields are empty, we need all filled
-        if not (name and roll and age and study_hours and sleep_duration and suicidal_thoughts and fam_history):
+        if not (name and roll and sleep_duration and suicidal_thoughts and fam_history):
             QtWidgets.QMessageBox.warning(self, "Input Error", "Please fill all fields.")
             return
 
@@ -77,13 +77,11 @@ class DepreClass(QtWidgets.QMainWindow):
         df['Total_Stress'] = df['Academic Pressure'] + df['Financial Stress']
 
         # Construct the features numpy array (in desired order)
-        features = df[['Total_Stress', 'Academic Pressure', 'Financial Stress', 'Sleep Duration', 'Work Hours',
-                        'Suicidal Thoughts', 'Age', 'Dietary Habits', 'Family History']].to_numpy()
-
-        print("Checkpoint1")
+        features = df[['Suicidal Thoughts', 'Academic Pressure', 'Total_Stress',
+       'Sleep Duration', 'Financial Stress', 'Work Hours', 'Age',
+       'Dietary Habits', 'Family History']]
         prediction = self.model.predict(features)
-        print("Checkpoint2")
-        if prediction == 1:
+        if prediction[0] == 1:
             result_text = "At risk of depression"
         else:
             result_text = "Not at risk"
