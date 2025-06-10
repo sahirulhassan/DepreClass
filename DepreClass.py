@@ -12,11 +12,9 @@ class DepreClass(QtWidgets.QMainWindow):
         self.ui = Ui_DepreClass()
         self.ui.setupUi(self)
         self.numeric_scaler = joblib.load('Scalers/numericScaler.pkl')
+        self.ordinal_scaler = joblib.load('Scalers/ordinal_scaler.pkl')
         self.sleep_mapping = joblib.load('Mappings/sleep_map.pkl')
         self.diet_mapping = joblib.load('Mappings/diet_map.pkl')
-        self.scaler_0_5 = joblib.load('Scalers/scaler_0_5.pkl')
-        self.scaler_1_3 = joblib.load('Scalers/scaler_1_3.pkl')
-        self.scaler_1_4 = joblib.load('Scalers/scaler_1_4.pkl')
         self.model = joblib.load('depression_model.pkl')
         self.ui.submitBtn.clicked.connect(self.handleSubmit)
 
@@ -57,30 +55,26 @@ class DepreClass(QtWidgets.QMainWindow):
         }
         df = pd.DataFrame(data)
 
-        # Transform 'Age' and 'Work Hours' (Study Hours)
+        # Transform Numeric Cols
         df[['Age', 'CGPA', 'Work Hours']] = self.numeric_scaler.transform(df[['Age', 'CGPA', 'Work Hours']])
 
-        # Map and transform 'Sleep Duration'
+        # Map Sleep Duration and Dietary Habits
         df['Sleep Duration'] = df['Sleep Duration'].map(self.sleep_mapping)
-        df[['Sleep Duration']] = self.scaler_1_4.transform(df[['Sleep Duration']])
-
-        # Map and transform 'Dietary Habits'
         df['Dietary Habits'] = df['Dietary Habits'].map(self.diet_mapping)
-        df[['Dietary Habits']] = self.scaler_1_3.transform(df[['Dietary Habits']])
 
-        # Transform 'Academic Pressure' and 'Financial Stress'
-        df[['Academic Pressure', 'Financial Stress', 'Study Satisfaction']] = self.scaler_0_5.transform(
-            df[['Academic Pressure', 'Financial Stress', 'Study Satisfaction']]
-        )
+        # Transform Ordinal Columns
+        ordinal_cols = ['Academic Pressure', 'Study Satisfaction','Financial Stress', 'Sleep Duration', 'Dietary Habits']
+        df[ordinal_cols] = self.ordinal_scaler.transform(df[ordinal_cols])
 
         # Calculate 'Total Stress'
         df['Total_Stress'] = df['Academic Pressure'] + df['Financial Stress']
 
-        # Construct the features numpy array (in desired order)
-        features = df[['Suicidal Thoughts', 'Work Hours', 'Sleep Duration', 'Total_Stress',
-       'Financial Stress', 'Academic Pressure', 'Age', 'Dietary Habits',
-       'Family History']]
+        # Reorder the DF in desired order
+        features = df[['Financial Stress', 'Sleep Duration', 'Suicidal Thoughts', 'Work Hours',
+       'Total_Stress', 'Academic Pressure', 'Age', 'Dietary Habits', 'Family History']]
+
         prediction = self.model.predict(features)
+
         if prediction[0] == 1:
             result_text = "At risk of depression"
         else:
