@@ -1,21 +1,26 @@
 import sys
+import os
 import pandas as pd
 import joblib
 from PyQt6 import QtWidgets
-
 from ui_depreclass import Ui_DepreClass
 
+def resource_path(relative_path):
+    """ Get absolute path to resource (for PyInstaller .exe or dev mode) """
+    if hasattr(sys, '_MEIPASS'):
+        return os.path.join(sys._MEIPASS, relative_path)  # PyInstaller temp folder
+    return os.path.join(os.path.abspath("."), relative_path)
 
 class DepreClass(QtWidgets.QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = Ui_DepreClass()
         self.ui.setupUi(self)
-        self.numeric_scaler = joblib.load('Scalers/numericScaler.pkl')
-        self.ordinal_scaler = joblib.load('Scalers/ordinal_scaler.pkl')
-        self.sleep_mapping = joblib.load('Mappings/sleep_map.pkl')
-        self.diet_mapping = joblib.load('Mappings/diet_map.pkl')
-        self.model = joblib.load('depression_model.pkl')
+        self.numeric_scaler = joblib.load(resource_path('Scalers/numericScaler.pkl'))
+        self.ordinal_scaler = joblib.load(resource_path('Scalers/ordinal_scaler.pkl'))
+        self.sleep_mapping = joblib.load(resource_path('Mappings/sleep_map.pkl'))
+        self.diet_mapping = joblib.load(resource_path('Mappings/diet_map.pkl'))
+        self.model = joblib.load(resource_path('depression_model.pkl'))
         self.ui.submitBtn.clicked.connect(self.handleSubmit)
 
     def handleSubmit(self):
